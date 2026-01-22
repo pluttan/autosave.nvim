@@ -5,7 +5,7 @@ local M = {}
 
 M.config = {
     enabled = true,
-    events = { "InsertLeave", "FocusLost" },
+    events = { "InsertLeave", "FocusLost", "TextChanged" },
     silent = true,
     debounce_delay = 150,
 }
