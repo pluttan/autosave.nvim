@@ -4,10 +4,6 @@
 
 **Автосохранение файлов в Neovim при смене режима и потере фокуса**
 
-[![License](https://img.shields.io/badge/license-MIT-2C2C2C?style=for-the-badge&labelColor=1E1E1E)](LICENSE)
-[![Lua](https://img.shields.io/badge/Lua-2C2D72?style=for-the-badge&logo=lua&labelColor=1E1E1E)](https://www.lua.org)
-[![Neovim](https://img.shields.io/badge/Neovim-57A143?style=for-the-badge&logo=neovim&labelColor=1E1E1E)](https://neovim.io)
-
 </div>
 
 Плагин для Neovim с нулевым трением при работе. Сохраняет изменённые буферы по событиям `InsertLeave`, `FocusLost` и `TextChanged` с дебаунсингом, автоматически пропуская специальные буферы, безымянные файлы и буферы только для чтения.
@@ -20,7 +16,27 @@
 - ❖ **Тихий режим** — сохраняет без вывода сообщений; ошибки появляются через `vim.notify` при отключённом silent
 - ❖ **Команды переключения** — `:AutosaveEnable`, `:AutosaveDisable`, `:AutosaveToggle` в любой момент
 
-## ■ Установка
+## ■ Стек
+
+<div align="center">
+
+| Компонент | Технология |
+|-----------|------------|
+| Plugin language | Lua |
+| Host | Neovim |
+
+</div>
+
+## ■ Как это работает
+
+```
+1. При запуске регистрирует слушатели autocmd для заданных событий (InsertLeave, FocusLost, TextChanged по умолчанию)
+2. Когда событие срабатывает, запускается таймер дебаунса (по умолчанию 150 мс) для предотвращения лишних записей при быстром редактировании
+3. После задержки плагин проверяет, доступен ли текущий буфер для записи — именован, модифицируем, не является специальным buftype
+4. Если буфер прошёл все проверки, он записывается тихо; ошибки появляются через vim.notify
+```
+
+## ■ Использование
 
 ### lazy.nvim
 
@@ -44,28 +60,36 @@
 
 ```lua
 require("autosave").setup({
-    enabled        = true,                                   -- включить при старте
-    events         = { "InsertLeave", "FocusLost",          -- события-триггеры
-                       "TextChanged" },
-    silent         = true,                                   -- подавить сообщения записи
+    enabled       = true,                                    -- включить при старте
+    events        = { "InsertLeave", "FocusLost",           -- события-триггеры
+                      "TextChanged" },
+    silent        = true,                                    -- подавить сообщения записи
     debounce_delay = 150,                                   -- задержка перед сохранением (мс)
 })
 ```
 
+<div align="center">
+
 | Параметр | По умолчанию | Описание |
 |----------|-------------|----------|
 | `enabled` | `true` | Включить автосохранение при запуске |
-| `events` | `{ "InsertLeave", "FocusLost", "TextChanged" }` | События Neovim, вызывающие сохранение |
+| `events` | `{ "InsertLeave", "FocusLost", "TextChanged" }` | События Neovim autocmd, вызывающие сохранение |
 | `silent` | `true` | Использовать `silent! write` для подавления сообщений |
 | `debounce_delay` | `150` | Задержка дебаунсинга перед записью в мс |
 
+</div>
+
 ### Команды
+
+<div align="center">
 
 | Команда | Описание |
 |---------|----------|
 | `:AutosaveEnable` | Включить автосохранение |
 | `:AutosaveDisable` | Отключить автосохранение |
 | `:AutosaveToggle` | Переключить автосохранение |
+
+</div>
 
 ## ■ Лицензия
 
